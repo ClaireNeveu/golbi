@@ -1,5 +1,6 @@
 module Database
-       ( login,
+       ( dbConnection,
+         login,
          logout,
          getPostById,
          getPostBySlug,
@@ -22,6 +23,8 @@ connect = connectPostgreSQL ("host=" ++ host ++
                              " dbname=" ++ name ++
                              " user=" ++ user ++
                              " password=" ++ password)
+
+dbConnection = connect
 
 login :: IO ()
 login = undefined
@@ -89,9 +92,19 @@ selectPosts conn (Just (start, end)) =
     quickQuery' conn
         "SELECT id, title, slug, content, posted, author, parent FROM posts LIMIT ?,?"
         [toSql start, toSql end]
+        
+selectChildren :: IConnection a => a -> Int -> Maybe (Int, Int) -> IO [[SqlValue]]
+selectChildren conn parentId Nothing =
+    quickQuery conn
+        "SELECT id, title, slug, content, posted, author, parent FROM posts WHERE parent=?"
+        [toSql parentId]
+selectChildren conn parentId (Just (start, end)) =
+    quickQuery conn
+        "SELECT id, title, slug, content, posted, author, parent FROM posts WHERE parent=? LIMIT ?,?"
+        [toSql parentId, toSql start, toSql end]
 
-makePost :: [SqlValue] -> Post
-makePost [id, title, slug, content, posted, author, parent] =
+makePost :: [Post]-> [SqlValue] -> Post
+makePost children [id, title, slug, content, posted, author, parent] =
     Post { postId = fromSql id,
            postTitle = fromSql title,
            postSlug = fromSql slug,
@@ -99,34 +112,36 @@ makePost [id, title, slug, content, posted, author, parent] =
            postTime = fromSql posted,
            postAuthor = fromSql author,
            postParent = fromSql parent, 
-           postShowInNav = True }
+           postShowInNav = True, 
+           postChildren = children }
 
-getPostBySlug :: String -> IO (Maybe Post)
-getPostBySlug slug = do
-    conn <- connect
+getPostBySlug :: IConnection a => a -> String -> IO (Maybe Post)
+getPostBySlug conn slug = do
     r <- selectPostBySlug conn slug
-    return (createMaybePost r)
-    where createMaybePost Nothing = Nothing
-          createMaybePost (Just x) = Just (makePost x)
+    return (createMaybePost [] r)
+    where createMaybePost _ Nothing = Nothing
+          createMaybePost y (Just x) = Just (makePost y x)
 
-getPostById :: Int -> IO (Maybe Post)
-getPostById id = do
-    conn <- connect
+getPostById :: IConnection a => a -> Int -> IO (Maybe Post)
+getPostById conn id = do
     r <- selectPost conn id
-    return (createMaybePost r)
-    where createMaybePost Nothing = Nothing
-          createMaybePost (Just x) = Just (makePost x)
+    children <- getChildren conn id Nothing
+    return (createMaybePost children r)
+    where createMaybePost _ Nothing = Nothing
+          createMaybePost y (Just x) = Just (makePost y x)
 
 getPosts :: Maybe (Int, Int) -> IO [Post]
 getPosts limit = do
     conn <- connect
     r <- selectPosts conn limit
-    return (map makePost r)
+    return (map (makePost []) r)
+
+getChildren :: IConnection a => a -> Int -> Maybe (Int, Int) -> IO [Post]
+getChildren conn parentId limit = do
+    r <- selectChildren conn parentId limit
+    return (map (makePost []) r)
 
 publishPost :: Post -> IO ()
 publishPost = undefined
-
-defaultPost :: Post
-defaultPost = undefined
 
 -- INSERT INTO posts (title, slug, content, posted, author, parent) VALUES ('Home', 'home', 'This is the content.', now(), 0, NULL);

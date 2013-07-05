@@ -1,10 +1,12 @@
 import Database
+import Database.HDBC (disconnect)
 import Template
 import Post
 import Network.CGI
 import Text.XHtml
 import System.IO
 import Data.Maybe
+import Control.Monad (liftM2)
 
 pageHeader = header << thetitle << "Home Page"
 
@@ -13,18 +15,18 @@ pageBody = body << thediv << h1 << "Hello World"
 pageNotFound = header << thetitle << "404 Page Not Found" +++  
                (body << h1 << "404 Page Not Found")
 
-cgiMain template = do
+cgiMain handle template = do
     postId <- getInput "p"
     postSlug <- getInput "s"
     case (postId, postSlug) of
         (Just pId, _) -> do
-            post <- liftIO (getPostById ((read pId) :: Int))
+            post <- liftIO (getPostById handle ((read pId) :: Int))
             case post of
                 Nothing -> output . renderHtml $ pageNotFound
                 Just p -> output . renderHtml $ elementsToHtml 
                           (expandMacros template p)
         (_, Just pSlug) -> do
-            post <- liftIO (getPostBySlug pSlug)
+            post <- liftIO (getPostBySlug handle pSlug)
             case post of
                 Nothing -> output . renderHtml $ pageNotFound
                 Just p -> output . renderHtml $ elementsToHtml 
@@ -33,9 +35,11 @@ cgiMain template = do
 
 main = do
     handle <- openFile "index.template" ReadMode
+    dbConn <- dbConnection
     template <- getTemplate handle
-    runCGI (handleErrors (cgiMain template))
+    runCGI (handleErrors (cgiMain dbConn template))
     hClose handle
+    disconnect dbConn
 
 elementsToHtml [] = noHtml
 elementsToHtml (el:els) 
@@ -45,17 +49,25 @@ elementsToHtml (el:els)
 
 expandMacros :: [Element] -> Post -> [Element]
 expandMacros [] _ = []
-expandMacros (el:els) post 
+expandMacros (el:els) post
     | elType el == "macro" = expandMacro el post ++ (expandMacros els post)
-    | otherwise = (Element (elType el) 
-                   (elAttrs el) 
+    | otherwise = (Element (elType el)
+                   (elAttrs el)
                    (expandMacros (elChildren el) post))
                   : (expandMacros els post)
 
 expandMacro :: Element -> Post -> [Element]
 expandMacro el post =
     case (words (getAttr "action" (elAttrs el))) of
-        ["getTitle"] -> [Element "text" [("content", postTitle post)] []]
+        ["getTitle"] -> 
+            [Element "text" [("content", postTitle post)] []]
+        ["getContent"] -> 
+            [Element "text" 
+             [("content", fromMaybe "" (postContent post))] []]
+        ["getChildren"] -> 
+            [Element "text" 
+             [("content", postTitle (head $ postChildren post))] []]
+        ["getChildren", postId] -> undefined
         _ -> [el]
 
 {-

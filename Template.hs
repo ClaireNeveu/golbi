@@ -32,7 +32,7 @@ getTemplate handle = do
     tString <- hGetContents handle
     return (tagsToElements (parseTags tString))
 
-tagsToElements :: [Tag String] -> [Element]
+tagsToElements :: [Tag String] -> [Element] {- This totally does not work -}
 tagsToElements (t:ts) = 
     case t of
         (TagOpen s a) -> openTag (splitAtElem (TagClose s) ts)
@@ -44,9 +44,6 @@ tagsToElements (t:ts) =
                               ++ (tagsToElements ts)
         _ -> [] ++ (tagsToElements ts)
 tagsToElements [] = []
-
-expandMacros :: [Element] -> [Element]
-expandMacros (e:es) = undefined
 
 splitAtElem :: Eq a => a -> [a] -> ([a], [a])
 splitAtElem x ys = splitAt (fromMaybe (length ys) (elemIndex x ys)) ys

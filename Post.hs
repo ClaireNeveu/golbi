@@ -1,6 +1,5 @@
 module Post
-       ( Post(..),
-         DBPost
+       ( Post(..)
        ) where
 
 import Data.Time.Clock
@@ -13,14 +12,6 @@ data Post = Post {
     postTime :: UTCTime,
     postAuthor :: Int,
     postParent :: Maybe Int,
-    postShowInNav :: Bool
+    postShowInNav :: Bool,
+    postChildren :: [Post]
     } deriving ()
-
-type DBPost = Int
-	-> String 
-    -> String
-    -> String
-    -> UTCTime
-    -> Int
-    -> Int
-    -> Bool
