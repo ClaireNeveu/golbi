@@ -73,3 +73,4 @@ separateMacros str = loop str [] []
                                                   [("action",  acc)] 
                                                   []])
               | otherwise = loop xs (acc++[x]) pairList
+                            
