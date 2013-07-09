@@ -1,4 +1,4 @@
 golbi
 =====
 
-A blogging CMS written in Haskell.
+Golbi is a blogging CMS written in Haskell.
