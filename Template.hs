@@ -32,18 +32,23 @@ getTemplate handle = do
     tString <- hGetContents handle
     return (tagsToElements (parseTags tString))
 
-tagsToElements :: [Tag String] -> [Element] {- This totally does not work -}
-tagsToElements (t:ts) = 
-    case t of
-        (TagOpen s a) -> openTag (splitAtElem (TagClose s) ts)
-        	where openTag (f, r) = [Element s a (tagsToElements f)] 
-                  	++ tagsToElements (tail r)
-        (TagText s) -> if all isSpace s
-                         then [] ++ (tagsToElements ts)
-                         else separateMacros (filter (not . isControl) s)
-                              ++ (tagsToElements ts)
-        _ -> [] ++ (tagsToElements ts)
+tagsToElements :: [Tag String] -> [Element]
 tagsToElements [] = []
+tagsToElements ((TagOpen s a):ts) = 
+    Element s a (tagsToElements chil) : (tagsToElements els) 
+        where (chil, els) = tagChildren ts [] 0
+              tagChildren (t@(TagClose _):ts) acc 0 = (acc, ts)
+              tagChildren (t@(TagClose _):ts) acc inc = 
+                  tagChildren ts (acc ++ [t]) (inc - 1)
+              tagChildren (t@(TagOpen _ _):ts) acc inc = 
+                  tagChildren ts (acc ++ [t]) (inc + 1)
+              tagChildren (t:ts) acc inc = 
+                  tagChildren ts (acc ++ [t]) inc
+tagsToElements ((TagText s):ts) = 
+    if all isSpace s
+       then tagsToElements ts
+       else separateMacros (filter (not . isControl) s) ++ (tagsToElements ts)
+tagsToElements (_:ts) = tagsToElements ts
 
 splitAtElem :: Eq a => a -> [a] -> ([a], [a])
 splitAtElem x ys = splitAt (fromMaybe (length ys) (elemIndex x ys)) ys
