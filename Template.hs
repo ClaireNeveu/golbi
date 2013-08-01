@@ -2,7 +2,8 @@ module Template
        ( Element(..),
          elContent,
          getAttr,
-         getTemplate
+         getTemplate,
+         parseTemplate
        ) where  
 
 import Text.HTML.TagSoup
@@ -31,6 +32,9 @@ getTemplate :: Handle -> IO [Element]
 getTemplate handle = do
     tString <- hGetContents handle
     return (tagsToElements (parseTags tString))
+
+parseTemplate :: String -> [Element]
+parseTemplate tString = tagsToElements (parseTags tString)
 
 tagsToElements :: [Tag String] -> [Element]
 tagsToElements [] = []

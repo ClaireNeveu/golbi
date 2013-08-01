@@ -8,6 +8,13 @@ import System.IO
 import Data.Maybe
 import Control.Monad (liftM2)
 
+--Begin Global Settings
+
+homePageID = 1
+siteName = "Chris Neveu :: "
+
+--End Global Settings
+
 pageHeader = header << thetitle << "Home Page"
 
 pageBody = body << thediv << h1 << "Hello World"
@@ -31,12 +38,18 @@ cgiMain handle template = do
                 Nothing -> output . renderHtml $ pageNotFound
                 Just p -> output . renderHtml $ elementsToHtml 
                           (expandMacros template p)
-        (_, _) -> output . renderHtml $ pageNotFound
+        (_, _) -> do
+            post <- liftIO (getPostById handle homePageID)
+            case post of
+                Nothing -> output . renderHtml $ pageNotFound
+                Just p -> output . renderHtml $ elementsToHtml 
+                          (expandMacros template p)
 
 main = do
     handle <- openFile "index.template" ReadMode
+    tString <- hGetContents handle
     dbConn <- dbConnection
-    template <- getTemplate handle
+    let template = parseTemplate tString
     runCGI (handleErrors (cgiMain dbConn template))
     hClose handle
     disconnect dbConn
@@ -45,7 +58,11 @@ elementsToHtml [] = noHtml
 elementsToHtml (el:els) 
     | elType el == "text" = stringToHtml (elContent el)
     | otherwise = (tag (elType el) (elementsToHtml (elChildren el)))
-                                   +++ elementsToHtml els
+                  ! attrToHtml (elAttrs el)
+                  +++ elementsToHtml els
+
+attrToHtml [] = []
+attrToHtml ((a, s):as) = strAttr a s : attrToHtml as
 
 expandMacros :: [Element] -> Post -> [Element]
 expandMacros [] _ = []
@@ -62,8 +79,7 @@ expandMacro el post =
         ["getTitle"] -> 
             [Element "text" [("content", postTitle post)] []]
         ["getContent"] -> 
-            [Element "text" 
-             [("content", fromMaybe "" (postContent post))] []]
+            parseTemplate (fromMaybe "" (postContent post))
         ["getChildren"] -> 
             [Element "text" 
              [("content", postTitle (head $ postChildren post))] []]
