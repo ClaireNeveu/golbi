@@ -1,0 +1,24 @@
+User
+    name Text
+    password Text Maybe
+    privilege Int default=0
+    UniqueUser name
+    deriving Typeable Show
+Entry
+    author UserId Maybe
+    parent EntryId Maybe
+    publishTime UTCTime
+    title Text Maybe
+    slug Text Maybe
+    content Html
+Leaf
+    slug Text
+    title Text Maybe
+    content Html
+    UniqueLeaf slug
+Session
+    user UserId
+    seriesId Text
+    token Text
+
+ -- By default this file is used in Model.hs (which is imported by Foundation.hs)

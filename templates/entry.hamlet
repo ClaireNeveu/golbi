@@ -1,0 +1,13 @@
+$maybe title <- entryTitle entry
+    <h1>#{title}
+<article> #{entryContent entry}
+<div class=postMeta>Published on #{publishTime}
+$if adminStatus
+    <div class=formWrapper>
+        <div class=afterMeta>
+            <a href=# class=expandButton>Edit post
+        <div class="expandArea expander collapsed">
+            <form method=put action=@{EntryR entryId} enctype=#{enctype} class=jsForm>
+                ^{entryWidget}
+                <div>
+                    <input type=submit value="Publish">

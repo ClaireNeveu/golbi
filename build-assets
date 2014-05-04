@@ -1,0 +1,4 @@
+#/bin/bash
+
+cd static/ts
+tsc * --outDir ../js

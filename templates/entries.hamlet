@@ -1,0 +1,27 @@
+$if null entries
+    <p>You haven't posted anything!
+$else
+    $forall Entity entryId entry <- entries
+        <article>
+            <h3>
+                <a href=@{EntryR entryId} >
+                    $maybe title <- entryTitle entry
+                        #{title}
+            <p class=excerpt>
+                #{excerptHtml 200 $ entryContent entry}
+^{pagination}
+$maybe _ <- maid
+    <hr>
+    $if adminStatus
+        <div class=formWrapper>
+            <div class=afterMeta>
+                <a href=# class=expandButton>New post
+            <div class="expandArea expander collapsed">
+                <form method=post action=@{RootEntryR} enctype=#{enctype}>
+                    ^{entryWidget}
+                    <div>
+                        <input type=submit value="Publish">
+$nothing
+    <hr>
+    <div class=afterMeta>
+        <a href=@{AuthR LoginR}>Log in

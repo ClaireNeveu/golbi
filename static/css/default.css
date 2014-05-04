@@ -1,0 +1,89 @@
+.container {
+   width: 40em;
+}
+
+body {
+   margin: 0;
+   padding: 15px;
+   background-image: url("../img/bg2.png");
+}
+
+.container > header {
+   margin: 0 0 5px;
+}
+
+#main {
+   background: none repeat scroll 0 0 #FFFFFF;
+   font-family: 'Verdana',Sans;
+   font-size: 1em;
+   font-weight: normal;
+}
+
+#main {
+   margin: 0;
+   padding: 15px;
+}
+
+footer {
+   margin: 0;
+   padding: 5px 0 0;
+   color: #ffffff;
+}
+
+.postMeta {
+   font-family: Courier, Monospace;
+   color: #dedede;
+   font-size: 85%;
+   border-top: 1px solid #EEEEEE;
+   margin: 20px 0 0;
+   padding: 5px 0 0;
+}
+
+.expander {
+   transition: max-height 1s ease-in;
+   overflow: hidden;
+}
+
+.collapsed {
+   transition: max-height 1s ease-out;
+   max-height: 0;
+}
+
+.afterMeta {
+  display: block;
+  font-size: 85%;
+  margin: -20px 0 0;
+  text-align: right;
+}
+
+.copyleft {
+   -moz-transform: scaleX(-1);
+   -o-transform: scaleX(-1);
+   -webkit-transform: scaleX(-1);
+   transform: scaleX(-1);
+   display: inline-block;
+}
+
+.excerpt {
+   line-height: 1.4em;
+   max-height: 42.em;
+   overflow: hidden;
+}
+
+.pagination {
+   text-align:center;
+}
+.pagination li {
+   display: inline-block;
+   margin: 0 5px;
+}
+.pagination .disabled a {
+   visibility: hidden;
+}
+.pagination .active a {
+   visibility: visible;
+   color: #333333;
+}
+.pagination .active a:hover {
+   text-decoration: none;
+}

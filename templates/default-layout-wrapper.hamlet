@@ -1,0 +1,42 @@
+$newline never
+\<!doctype html>
+\<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+\<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+\<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+\<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+    <head>
+        <meta charset="UTF-8">
+
+        <title>#{pageTitle pc}
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        ^{pageHead pc}
+
+        \<!--[if lt IE 9]>
+        \<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        \<![endif]-->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js">
+
+        <script>
+          document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/,'js');
+    <body>
+        <div class="container">
+            <header>
+                <a id="logo" href=@{HomeR}>
+                    <img alt="Chris Neveu" src=@{StaticR img_logo_png}>
+            <div id="main" role="main">
+              ^{pageBody pc}
+            <footer>
+                <span class=copyleft>©</span> All Rights Reversed
+                    
+        <script src=@{StaticR js_forms_js}>
+        <script src=@{StaticR js_expander_js}>
+        \<!--[if lt IE 7 ]>
+            <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js">
+            <script>
+                window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})
+        \<![endif]-->
