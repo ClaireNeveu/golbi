@@ -152,7 +152,7 @@ instance YesodAuth App where
                 fmap Just $ insert $ User (credsIdent creds) Nothing 1
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def, authGoogleEmail]
+    authPlugins _ = [authBrowserId def]
 
     authHttpManager = httpManager
 
