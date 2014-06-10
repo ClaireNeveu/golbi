@@ -17,4 +17,5 @@ getHomeR = do
     sess <- getSession
     (entryWidget, enctype) <- generateFormPost blankEntryForm
     defaultLayout $ do
+        setTitle $ toHtml "ChrisNeveu.com"
         $(widgetFile "entries")
