@@ -20,17 +20,6 @@ import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
-import Data.Text
-
-type MaybeEntryId = Maybe EntryId
-type MaybeText = Maybe Text
-instance (PathPiece a) => PathPiece (Maybe a) where
-    toPathPiece (Just a) = toPathPiece a
-    toPathPiece Nothing = ""
-    fromPathPiece s =
-        case read $ unpack s of
-            (i, ""):_ -> Just $ fromPathPiece i
-            _ -> Nothing
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
