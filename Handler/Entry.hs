@@ -12,9 +12,11 @@ import Forms
 import Data.Time (UTCTime)
 import Data.Time.Format
 import System.Locale
+import Util
     
 getEntryR :: EntryId -> Handler Html
 getEntryR entryId = do
+    addCacheControl [Public, MaxAge 60]
     auth <- isAdmin
     let adminStatus = authToBool auth
     entry <- runDB $ get404 entryId

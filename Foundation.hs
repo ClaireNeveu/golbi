@@ -5,7 +5,6 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.BrowserId
-import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Form.Nic (YesodNic)
@@ -156,19 +155,13 @@ instance YesodNic App
 getExtra :: Handler Extra
 getExtra = fmap (appExtra . settings) getYesod
 
--- Note: previous versions of the scaffolding included a deliver function to
--- send emails. Unfortunately, there are too many different options for us to
--- give a reasonable default. Instead, the information is available on the
--- wiki:
---
--- https://github.com/yesodweb/yesod/wiki/Sending-email
-
 isAdminUser :: User -> Bool
 isAdminUser user = userPrivilege user >= 4
 
 isAdminUserM :: Maybe User -> Bool
 isAdminUserM = maybe False isAdminUser
 
+isAdmin :: HandlerT App IO AuthResult
 isAdmin = do
     mu <- maybeAuth
     let muser = fmap entityVal mu 

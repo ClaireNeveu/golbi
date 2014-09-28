@@ -9,6 +9,7 @@ import Yesod.Paginator
 
 getHomeR :: Handler Html
 getHomeR = do
+    addCacheControl [Public, MaxAge 60]
     maid <- maybeAuth
     auth <- isAdmin
     let adminStatus = authToBool auth
