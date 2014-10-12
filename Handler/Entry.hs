@@ -12,7 +12,8 @@ import Forms
 import Data.Time (UTCTime)
 import Data.Time.Format
 import System.Locale
-import Util
+import Util.CacheControl
+import Util.HeaderNames
     
 getEntryR :: EntryId -> Handler Html
 getEntryR entryId = do
@@ -39,7 +40,7 @@ postEntryR parentId = do
         FormSuccess entry -> do
             entryId <- runDB $ insert entry
             setMessage $ toHtml ("Entry created" :: Text)
-            addHeader "Golbi-Redirect" "url"
+            addHeader golbiRedirect "url"
             redirect $ EntryR entryId
         _ -> defaultLayout $ do
             setTitle "Invalid input"
@@ -54,8 +55,8 @@ putEntryR entryId = do
             runDB $ replace entryId entry
             setMessage $ toHtml ("Entry updated" :: Text)
             url <- toTextUrl $ EntryR entryId
-            addHeader "Golbi-Redirect" url
-        _ -> addHeader "Golbi-Error" "Form error"
+            addHeader golbiRedirect url
+        _ -> addHeader golbiError "Form error"
         
 -- Deletes an entry
 deleteEntryR :: EntryId -> Handler Html

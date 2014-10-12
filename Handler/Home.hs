@@ -4,6 +4,7 @@ module Handler.Home where
 import Import
 import Forms
 import Util
+import Util.CacheControl
 import Yesod.Auth
 import Yesod.Paginator
 

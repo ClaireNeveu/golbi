@@ -21,6 +21,8 @@ library
                      Settings.Development
                      Forms
                      Util
+                     Util.HeaderNames
+                     Util.CacheControl
                      Handler.Home
                      Handler.Entry
 
