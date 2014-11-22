@@ -1,0 +1,65 @@
+---
+- hosts: localhost
+  remote_user: vagrant
+  vars:
+    http_port: 80
+    vagrant_dir: '/home/chris/Vagrant/DROP-001_Local'
+  tasks:
+  - name: Vagrant is up
+    shell: vagrant up
+    args:
+      chdir: "{{ vagrant_dir }}"
+    delegate_to: localhost
+    
+  - name: Checkout git repo
+    git: repo=git@github.com:ChrisNeveu/golbi.git dest={{ vagrant_dir }}/golbi accept_hostkey=yes
+    delegate_to: localhost
+
+    # We need this for access to current versions of GHC and cabal.
+  - name: Add debian/testing repo
+    apt_repository: repo='deb http://http.us.debian.org/debian/ testing main' state=present
+    sudo: yes
+    delegate_to: drop-001_local
+
+  - name: Apt is Up-To-Date
+    apt: update_cache=yes
+    sudo: yes
+    delegate_to: drop-001_local
+
+  - name: GHC is Installed
+    apt: name=ghc state=latest default_release=testing
+    sudo: yes
+    delegate_to: drop-001_local
+
+  - name: Cabal is Installed
+    apt: name=cabal-install state=latest default_release=testing
+    sudo: yes
+    delegate_to: drop-001_local
+
+  - name: Cabal is Up-To-Date
+    shell: cabal update
+    delegate_to: drop-001_local
+
+  - name: The Sandbox Exists
+    shell: cabal sandbox init
+    args:
+      chdir: /vagrant/golbi
+    delegate_to: drop-001_local
+
+  - name: Install golbi dependencies
+    shell: cabal install --only-dependencies
+    args:
+      chdir: "/vagrant/golbi"
+    delegate_to: drop-001_local
+
+  - name: Build golbi
+    shell: cabal build
+    args:
+      chdir: /vagrant/golbi
+    delegate_to: drop-001_local
+    
+  - name: Stop vagrant
+    shell: vagrant halt
+    args:
+      chdir: "{{ vagrant_dir }}"
+    delegate_to: localhost
