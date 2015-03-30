@@ -31,7 +31,7 @@ $newline never
             <div id="main" role="main">
               ^{pageBody pc}
             <footer>
-                <span class=copyleft>©</span> All Rights Reversed
+                <span class=copyleft>©</span> All Rights Reversed <a href="https://github.com/ChrisNeveu" style="float:right;">My Github</a>
                     
         <script src=@{StaticR js_forms_js}>
         <script src=@{StaticR js_expander_js}>
